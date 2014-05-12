@@ -1,0 +1,22 @@
+{
+    "name": "mcuadros/ansi-slides",
+    "type": "library",
+    "description": "",
+    "keywords": ["ansi", "cli", "console", "slides"],
+    "homepage": "https://github.com/mcuadros/ansi-slides",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Máximo Cuadros",
+            "email": "mcuadros@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "packaged/figlet": "dev-master",
+        "malenki/ansi": "1.2.6"
+    },
+    "autoload": {
+        "psr-0": { "ANSISlides": "src/" }
+    }
+}
