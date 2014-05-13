@@ -3,6 +3,9 @@
 namespace ANSISlides;
 
 use Packaged\Figlet\Figlet;
+use JakubOnderka\PhpConsoleColor\ConsoleColor;
+use JakubOnderka\PhpConsoleHighlighter\Highlighter;
+use Malenki\Ansi;
 
 class SlideRenderer
 {
@@ -18,47 +21,81 @@ class SlideRenderer
     public function render(Slide $slide)
     {
         $markdown = $slide->getMarkdown();
+        $markdown = $this->analyzeHeaders($markdown);
+        $markdown = $this->analyzeCodeLine($markdown);
 
-        return $this->valign($this->analyzeLines($markdown));
+        return $this->style(
+            $this->align(
+                $this->valign($markdown)
+            )
+        );
     }
 
-    protected function analyzeLines($markdown)
-    {
-        $result = [];
-        foreach (explode("\n", $markdown) as $line) {
-            $result[] = $this->align($this->analyzeLine($line));
-        }
-
-        return implode("\n", $result);
-    }
-
-    protected function align($text, $path = STR_PAD_BOTH)
+    protected function align($text, $path = STR_PAD_RIGHT)
     {
         $result = [];
         foreach (explode("\n", $text) as $line) {
-            $result[] = str_pad($line, $this->cols, ' ', $path);
+            if (strlen($line) > 0 && $line[0] != ' ') {
+                $line = ' ' . $line;
+            }
+
+            $result[] = str_pad($line, $this->cols, '     ');
         }
 
         return implode("\n", $result);
     }
 
-    protected function analyzeLine($line)
+    protected function style($markdown)
     {
-        preg_match('|(#+) (.*)|', $line, $matches);
-        if (!$matches) {
-            return $line;
+        $style = null;
+        $markdown = preg_replace_callback('|(\[(.*),(.*)\])|',
+            function($matches) use (&$style) {
+                $style = new Ansi();
+                $style->fg($matches[2])->bg($matches[3]);
+
+                return str_repeat(' ', strlen($matches[0]));
+            }
+        , $markdown);
+
+        if ($style) {
+            return $style->value($markdown);
         }
 
-        switch ($matches[1]) {
-            case '#':
-                return Figlet::create($matches[2], 'standard');
-            case '##':
-                return Figlet::create($matches[2], 'mini');
-            default:
-                return $matches[2];
-        }
+        return $markdown;
     }
 
+    protected function analyzeHeaders($markdown)
+    {
+        return preg_replace_callback('|(#+) (.*)|', function($matches) {
+            switch ($matches[1]) {
+                case '#':
+                    $result = Figlet::create($matches[2], 'standard');
+                    break;
+                case '##':
+                    $result = Figlet::create($matches[2], 'mini');
+                    break;
+                default:
+                    $result = $matches[2];
+                    break;
+            }
+
+            $tmp = explode("\n", $result);
+            unset($tmp[count($tmp)]);
+            unset($tmp[count($tmp)-1]);
+
+            return implode("\n", $tmp);
+        }, $markdown);
+    }
+
+    protected function analyzeCodeLine($markdown)
+    {
+        return preg_replace_callback('|(```(.*)```)|s', function($matches) {
+            $highlighter = new Highlighter(new ConsoleColor());
+            $result = $highlighter->getWholeFileWithLineNumbers('<?php ' . PHP_EOL . $matches[2]);
+
+            return substr($result, strpos($result, PHP_EOL) + 1);
+        }, $markdown);
+    }
 
     protected function valign($text)
     {
