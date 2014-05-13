@@ -31,15 +31,18 @@ class SlideRenderer
         );
     }
 
-    protected function align($text, $path = STR_PAD_RIGHT)
+    protected function align($text, $pad = STR_PAD_BOTH)
     {
         $result = [];
         foreach (explode("\n", $text) as $line) {
-            if (strlen($line) > 0 && $line[0] != ' ') {
-                $line = ' ' . $line;
-            }
+            $total = $this->lenWithoutStyle($line);
+            $toFill = ($this->cols - $total) / 2;
 
-            $result[] = str_pad($line, $this->cols, '     ');
+            $result[] = sprintf('%s%s%s',
+                str_repeat(' ', ceil($toFill)),
+                $line,
+                str_repeat(' ', floor($toFill))
+            );
         }
 
         return implode("\n", $result);
@@ -72,7 +75,9 @@ class SlideRenderer
                     $result = Figlet::create($matches[2], 'standard');
                     break;
                 case '##':
-                    $result = Figlet::create($matches[2], 'mini');
+                    //ogre
+                    $result = Figlet::create($matches[2], 'contributed/thin');
+                   // echo($result); exit();
                     break;
                 default:
                     $result = $matches[2];
@@ -93,8 +98,31 @@ class SlideRenderer
             $highlighter = new Highlighter(new ConsoleColor());
             $result = $highlighter->getWholeFileWithLineNumbers('<?php ' . PHP_EOL . $matches[2]);
 
-            return substr($result, strpos($result, PHP_EOL) + 1);
+            $block = substr($result, strpos($result, PHP_EOL) + 1);
+            $lines = explode("\n" , $block);
+
+            $max = 0;
+            foreach ($lines as $line) {
+                $len = $this->lenWithoutStyle($line);
+                if ($len > $max) {
+                    $max = $len;
+                }
+            }
+
+            foreach ($lines as &$line) {
+                $fill = $max - $this->lenWithoutStyle($line);
+                $line .= str_repeat(' ', $fill);
+            }
+
+            return implode("\n", $lines);
         }, $markdown);
+    }
+
+    protected function lenWithoutStyle($line)
+    {
+        $clean = preg_replace('/\x1b(\[|\(|\))[;?0-9]*[0-9A-Za-z]/', '', $line);
+
+        return strlen($clean);
     }
 
     protected function valign($text)

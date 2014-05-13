@@ -1,7 +1,6 @@
-[red,green]
+[green,black]
 ## The Hitchhiker's
-## Guide to the
-## HHVM
+## Guide to the HHVM
 Por Máximo Cuadros / @mcuadros_
 ---
 [black,yellow]
