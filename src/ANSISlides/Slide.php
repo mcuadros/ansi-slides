@@ -7,14 +7,9 @@ class Slide
     private $markdown;
     private $renderer;
 
-    public function setMarkdown($markdown)
+    public function __construct($markdown)
     {
         $this->markdown = $markdown;
-    }
-
-    public function getGeometry()
-    {
-        return [$this->width, $this->heigth];
     }
 
     public function getMarkdown()
