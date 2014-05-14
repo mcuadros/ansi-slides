@@ -23,7 +23,7 @@ class FadeIn
     {
         if (!$from) {
             $contentTo = $to->render($cols, $lines);
-            $this->printContent($contentTo);
+            $this->printContent($contentTo->current());
             return;
         }
 
@@ -35,7 +35,7 @@ class FadeIn
     {
         $contentFrom = $slide->render($cols, $lines);
         for ($i = 0; $i < $lines; $i++) {
-            $content = $this->fillContent($contentFrom, $cols, self::CHAR_176, 0, $i);
+            $content = $this->fillContent($contentFrom->current(), $cols, $lines, $i);
             $this->printContent($content);
         }
     }
@@ -44,29 +44,41 @@ class FadeIn
     {
         $contentTo = $slide->render($cols, $lines);
         for ($i = $lines; $i > 0; $i--) {
-            $content = $this->fillContent($contentTo, $cols, self::CHAR_176, 0, $i);
+            $content = $this->fillContent($contentTo->current(), $cols, $lines, $i);
             $this->printContent($content);
         }
 
-        $this->printContent($contentTo);
+        foreach ($contentTo as $current) {
+            $this->printContent($current);
+        }
     }
 
-    protected function fillContent($content, $cols, $char, $from, $to)
+    protected function fillContent($content, $cols, $lines, $to)
     {
-        $fill = (string) $this->style->value(str_repeat($char, $cols));
-        $lines = explode(PHP_EOL, $content);
-
-        for ($i = $from; $i < $to; $i++) {
-            $lines[$i] = $fill;
+        $output = explode(PHP_EOL, $content);
+        for ($i = 0; $i < $to; $i++) {
+            $char = $this->calcChar($i, $to, $lines);
+            $output[$i] = (string) $this->style->value(str_repeat($char, $cols));
         }
 
-        return implode(PHP_EOL, $lines);
+        return implode(PHP_EOL, $output);
+    }
+
+    protected function calcChar($line, $to, $lines)
+    {
+        $hidden = $lines - $to;
+
+        $steps = intval($lines / 3);
+        if ($line + $hidden > $steps*2) return self::CHAR_178;
+        if ($line + $hidden > $steps*1) return self::CHAR_177;
+        return self::CHAR_176;
     }
 
     protected function printContent($content)
     {
         $this->cleanScreen();
         echo $content;
+
         $this->sleep();
     }
 
@@ -77,6 +89,6 @@ class FadeIn
 
     protected function sleep()
     {
-        usleep(10000);
+        usleep(20000);
     }
 }

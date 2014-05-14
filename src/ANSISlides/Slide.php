@@ -31,12 +31,20 @@ class Slide
         $markdown = $this->analyzeImage($markdown);
         $markdown = $this->analyzeHeaders($markdown);
         $markdown = $this->analyzeCodeLine($markdown);
+        //$markdown = $this->analyzeList($markdown);
 
-        return $this->style(
-            $this->align(
-                $this->valign($markdown)
-            )
-        );
+        return $this->format($markdown);
+    }
+
+    protected function format($markdown)
+    {
+        foreach(explode(Deck::SLIDE_DIVISOR, $markdown) as $md) {
+            $md = $this->valign($md);
+            $md = $this->align($md);
+            $md = $this->style($md);
+
+            yield $md;
+        }
     }
 
     protected function align($text, $pad = STR_PAD_BOTH)
@@ -119,9 +127,7 @@ class Slide
                     $result = Figlet::create($matches[2], 'standard');
                     break;
                 case '##':
-                    //ogre
-                    $result = Figlet::create($matches[2], 'contributed/thin');
-                   // echo($result); exit();
+                    $result = Figlet::create($matches[2], '../../../../../fonts/ansi');
                     break;
                 default:
                     $result = $matches[2];
@@ -138,9 +144,16 @@ class Slide
 
     protected function analyzeCodeLine($markdown)
     {
-        return preg_replace_callback('|(```(.*)```)|s', function($matches) {
+        return preg_replace_callback('|```(php)?\n(.*)```|s', function($matches) {
+            $method = 'getWholeFile';
+            if ($matches[1] == 'php') {
+                $method = 'getWholeFileWithLineNumbers';
+            }
+
             $highlighter = new Highlighter(new ConsoleColor());
-            $result = $highlighter->getWholeFileWithLineNumbers('<?php ' . PHP_EOL . $matches[2]);
+            $result = $highlighter->$method(
+                '<?php ' . PHP_EOL . trim($matches[2])
+            );
 
             $block = substr($result, strpos($result, PHP_EOL) + 1);
             $lines = explode(PHP_EOL , $block);
@@ -162,11 +175,32 @@ class Slide
         }, $markdown);
     }
 
+    protected function analyzeList($markdown)
+    {
+        $tokens = [];
+        $markdown = preg_replace_callback('|\* (.*)|', function($matches) use (&$tokens) {
+            $token = uniqid();
+            $tokens[$token] = $matches[1];
+            return $token;
+        }, $markdown);
+
+        if (!$tokens) {
+            return $markdown;
+        }
+
+        $output = [];
+        foreach ($tokens as $token => $value) {
+            $output[] = str_replace($token, $value, $markdown);
+        }
+
+        return implode(Deck::SLIDE_DIVISOR, $output);
+    }
+
     protected function lenWithoutStyle($line)
     {
         $clean = preg_replace('/\x1b(\[|\(|\))[;?0-9]*[0-9A-Za-z]/', '', $line);
 
-        return strlen($clean);
+        return mb_strlen($clean, 'UTF-8');
     }
 
     protected function valign($text)

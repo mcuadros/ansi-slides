@@ -8,6 +8,8 @@ use Malenki\Ansi;
 
 class Deck
 {
+    const SLIDE_DIVISOR = "---\n";
+
     private $control;
     private $markdown;
     private $renderer;
@@ -56,7 +58,7 @@ class Deck
 
     protected function buildSlides()
     {
-        foreach(explode('---', $this->markdown) as $slideMarkdown) {
+        foreach(explode(self::SLIDE_DIVISOR, $this->markdown) as $slideMarkdown) {
             $slide = new Slide($slideMarkdown);
             $this->slides[] = $slide;
         }
