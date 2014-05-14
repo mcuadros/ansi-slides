@@ -12,7 +12,7 @@ class Control
     public function __construct()
     {
         $this->stdin = fopen('php://stdin', 'r');
-        system("stty -icanon");
+        system("stty -icanon -echo");
     }
 
     public function wait()
