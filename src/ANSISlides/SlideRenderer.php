@@ -9,6 +9,9 @@ use Malenki\Ansi;
 
 class SlideRenderer
 {
+    //From https://groups.google.com/forum/#!topic/iterm2-discuss/qACd1yHCXwo
+    const ITERM2_BACKGROUND = 'osascript -e \'tell application "iTerm" to set background image path of current session of current terminal to "%s"\'';
+
     private $cols = 0;
     private $lines = 0;
 
@@ -21,6 +24,7 @@ class SlideRenderer
     public function render(Slide $slide)
     {
         $markdown = $slide->getMarkdown();
+        $markdown = $this->analyzeImage($markdown);
         $markdown = $this->analyzeHeaders($markdown);
         $markdown = $this->analyzeCodeLine($markdown);
 
@@ -65,6 +69,32 @@ class SlideRenderer
         }
 
         return $markdown;
+    }
+
+    protected function analyzeImage($markdown)
+    {
+        preg_match('|\!\[(.*)\]\((.*)\)|', $markdown, $matches);
+        if (!$matches) {
+            $this->clearBackground();
+
+            return $markdown;
+        }
+
+        $this->setBackground($matches[2]);
+
+        return '';
+    }
+
+    protected function setBackground($path)
+    {
+        $cmd = sprintf(self::ITERM2_BACKGROUND, __DIR__.$path);
+        shell_exec($cmd);
+    }
+
+    protected function clearBackground()
+    {
+        $cmd = sprintf(self::ITERM2_BACKGROUND, '');
+        shell_exec($cmd);
     }
 
     protected function analyzeHeaders($markdown)
