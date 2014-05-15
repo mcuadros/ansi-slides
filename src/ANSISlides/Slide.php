@@ -124,22 +124,36 @@ class Slide
         return preg_replace_callback('|(#+) (.*)|', function($matches) {
             switch ($matches[1]) {
                 case '#':
-                    $result = Figlet::create($matches[2], 'standard');
-                    break;
+                    $result = Figlet::create($matches[2], '../../../../../fonts/ansi');                    break;
                 case '##':
-                    $result = Figlet::create($matches[2], '../../../../../fonts/ansi');
+                    $result = $this->drawSecondaryHeader($matches[2]);
                     break;
                 default:
                     $result = $matches[2];
                     break;
             }
 
-            $tmp = explode(PHP_EOL, $result);
-            unset($tmp[count($tmp)]);
-            unset($tmp[count($tmp)-1]);
+            $output = '';
+            foreach (explode(PHP_EOL, $result) as $line) {
+                if (strlen(trim($line)) != 0) {
+                    $output .= $line . PHP_EOL;
+                }
+            }
 
-            return implode(PHP_EOL, $tmp);
+            return $output;
         }, $markdown);
+    }
+
+    protected function drawSecondaryHeader($title)
+    {
+        $len = mb_strlen($title, 'UTF-8');
+
+        $line = [];
+        $line[] = '┌' . str_repeat('─', $len + 2) . '┐';
+        $line[] = '│ ' . $title . ' │';
+        $line[] = '└' . str_repeat('─', $len + 2) . '┘';
+
+        return implode(PHP_EOL, $line);
     }
 
     protected function analyzeCodeLine($markdown)

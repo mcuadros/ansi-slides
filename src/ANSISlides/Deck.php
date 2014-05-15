@@ -3,7 +3,7 @@
 namespace ANSISlides;
 
 use ANSISlides\Deck\Control;
-use ANSISlides\Deck\Transition\FadeIn;
+use ANSISlides\Deck\Transition\Swap;
 use Malenki\Ansi;
 
 class Deck
@@ -26,7 +26,7 @@ class Deck
     {
         $style = new Ansi();
         $style->fg('yellow')->bg('black');
-        $transition = new FadeIn($style);
+        $transition = new Swap($style);
 
         $max = count($this->slides);
         $position = 0;

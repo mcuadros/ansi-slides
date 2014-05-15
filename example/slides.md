@@ -1,21 +1,17 @@
 [green,black]
-## The Hitchhiker's
-## Guide to the HHVM
-Por Máximo Cuadros / @mcuadros_
----
-## abcdefghijklmnñop
-## qrstuvwxyz
-## ABCDEFGHIJKLMNRST
+# The Hitchhiker's
+# Guide to the HHVM
+## Por Máximo Cuadros / @mcuadros_
 ---
 [black,yellow]
-## Cuanto cabe
+# Cuanto cabe
 * Una prueba
 * Otra prueba
 * Y terminando
 ---
 ![Example Image](/../../example/images/9151048607_b5a552c4dd_c.jpg)
 ---
-## algo de codigo
+# algo de codigo
 
 ```php
 protected function align($text, $path = STR_PAD_RIGHT)
@@ -29,11 +25,11 @@ protected function align($text, $path = STR_PAD_RIGHT)
 }
 ```
 ---
-## Test
+# Test
 1. Una prueba
 2. Otra prueba
 ---
-## A table
+# A table
 ```
 ┌──────────┬──────────┐
 │ Version  │ Elapsed  │
