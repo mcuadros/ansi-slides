@@ -1,13 +1,13 @@
+![green,black]
 # The Hitchhiker's
 # Guide to the HHVM
 ## Por Máximo Cuadros / @mcuadros_
 ---
+![yellow,black]
 # Cuanto cabe
-* Una prueba
+![green,black]* Una prueba
 * Otra prueba
 * Y terminando
----
-![Example Image](/../../example/images/9151048607_b5a552c4dd_c.jpg)
 ---
 # algo de codigo
 
@@ -22,6 +22,8 @@ protected function align($text, $path = STR_PAD_RIGHT)
     return implode("\n", $result);
 }
 ```
+---
+![Example Image](/../../example/images/9151048607_b5a552c4dd_c.jpg)
 ---
 # Test
 1. Una prueba

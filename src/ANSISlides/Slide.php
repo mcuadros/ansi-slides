@@ -26,9 +26,7 @@ class Slide
         $this->background = $background;
 
         $this->style = new Ansi();
-        $this->style
-            ->fg($this->foreground)
-            ->bg($this->background);
+        $this->style->fg($foreground)->bg($background);
     }
 
     public function render($cols, $lines)
@@ -37,6 +35,7 @@ class Slide
         $this->lines = $lines;
 
         $markdown = $this->markdown;
+        $markdown = $this->analyzeStyle($markdown);
         $markdown = $this->analyzeImage($markdown);
         $markdown = $this->analyzeHeaders($markdown);
         $markdown = $this->analyzeCodeLine($markdown);
@@ -86,6 +85,23 @@ class Slide
         }
 
         return implode(PHP_EOL, $lines);
+    }
+
+    protected function analyzeStyle($markdown)
+    {
+        $markdown = preg_replace_callback('|(!\[(.*),(.*)\]\n)|', function($matches) {
+            $this->style->fg($matches[2])->bg($matches[3]);
+
+            return '';
+        }, $markdown);
+
+        return preg_replace_callback('|(!\[(.*),(.*)\])(.*)|', function($matches) {
+            //$this->style->fg($matches[2])->bg($matches[3]);
+            $style = new Ansi();
+            $style->fg($matches[2])->bg($matches[3]);
+
+            return '' . $style->value($matches[4]);
+        }, $markdown);
     }
 
     protected function analyzeImage($markdown)
@@ -184,7 +200,7 @@ class Slide
 
             foreach ($lines as &$line) {
                 $fill = $max - $this->lenWithoutStyle($line);
-                $line = $twoBlackSpace . $line . str_repeat(' ', $fill) . $twoBlackSpace;
+                $line = $twoBlackSpace . $line . str_repeat($blackSpace, $fill) . $twoBlackSpace;
             }
 
             $emptyLine = str_repeat($blackSpace, $max + 4);
