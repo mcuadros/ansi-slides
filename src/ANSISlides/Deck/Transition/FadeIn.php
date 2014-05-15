@@ -2,10 +2,11 @@
 
 namespace ANSISlides\Deck\Transition;
 
+use ANSISlides\Deck\Transition;
 use ANSISlides\Slide;
 use Malenki\Ansi;
 
-class FadeIn
+class FadeIn extends Transition
 {
     const CHAR_176 = '░';
     const CHAR_177 = '▒';
@@ -72,23 +73,5 @@ class FadeIn
         if ($line + $hidden > $steps*2) return self::CHAR_178;
         if ($line + $hidden > $steps*1) return self::CHAR_177;
         return self::CHAR_176;
-    }
-
-    protected function printContent($content)
-    {
-        $this->cleanScreen();
-        echo $content;
-
-        $this->sleep();
-    }
-
-    protected function cleanScreen()
-    {
-        print chr(27) . "[2J" . chr(27) . "[;H";
-    }
-
-    protected function sleep()
-    {
-        usleep(20000);
     }
 }

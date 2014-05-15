@@ -4,6 +4,7 @@ namespace ANSISlides;
 
 use Packaged\Figlet\Figlet;
 use Malenki\Ansi;
+use ANSISlides\Deck\Transition;
 
 class Slide
 {
@@ -15,18 +16,31 @@ class Slide
     private $markdown;
     private $renderer;
     private $style;
+    private $path;
+    private $transition;
 
-    public function __construct(
-        $markdown,
-        $foreground = 'black',
-        $background = 'yellow'
-    ) {
+    public function __construct($markdown, $fg = 'black', $bg = 'yellow') {
         $this->markdown = $markdown;
-        $this->foreground = $foreground;
-        $this->background = $background;
+        $this->foreground = $fg;
+        $this->background = $bg;
 
         $this->style = new Ansi();
-        $this->style->fg($foreground)->bg($background);
+        $this->style->fg($fg)->bg($bg);
+    }
+
+    public function setPath($path)
+    {
+        $this->path = $path;
+    }
+
+    public function setTransition(Transition $transition)
+    {
+        $this->transition = $transition;
+    }
+
+    public function play($cols, $lines, Slide $prev = null)
+    {
+        $this->transition->play($prev, $this, $cols, $lines);
     }
 
     public function render($cols, $lines)
@@ -96,7 +110,6 @@ class Slide
         }, $markdown);
 
         return preg_replace_callback('|(!\[(.*),(.*)\])(.*)|', function($matches) {
-            //$this->style->fg($matches[2])->bg($matches[3]);
             $style = new Ansi();
             $style->fg($matches[2])->bg($matches[3]);
 
@@ -119,9 +132,9 @@ class Slide
         return '';
     }
 
-    protected function setBackground($path)
+    protected function setBackground($image)
     {
-        $cmd = sprintf(self::ITERM2_BACKGROUND, __DIR__.$path);
+        $cmd = sprintf(self::ITERM2_BACKGROUND, $this->path . '/' .$image);
         shell_exec($cmd);
     }
 

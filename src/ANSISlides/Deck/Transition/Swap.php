@@ -2,10 +2,11 @@
 
 namespace ANSISlides\Deck\Transition;
 
+use ANSISlides\Deck\Transition;
 use ANSISlides\Slide;
 use Malenki\Ansi;
 
-class Swap
+class Swap extends Transition
 {
     public function play(Slide $from = null, Slide $to, $cols, $lines)
     {
@@ -34,23 +35,5 @@ class Swap
 
             $this->printContent(implode(PHP_EOL, $content));
         }
-    }
-
-    protected function printContent($content)
-    {
-        $this->cleanScreen();
-        echo $content;
-
-        $this->sleep();
-    }
-
-    protected function cleanScreen()
-    {
-        print chr(27) . "[2J" . chr(27) . "[;H";
-    }
-
-    protected function sleep()
-    {
-        usleep(20000);
     }
 }

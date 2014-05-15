@@ -23,7 +23,7 @@ protected function align($text, $path = STR_PAD_RIGHT)
 }
 ```
 ---
-![Example Image](/../../example/images/9151048607_b5a552c4dd_c.jpg)
+![Example Image](images/9151048607_b5a552c4dd_c.jpg)
 ---
 # Test
 1. Una prueba
