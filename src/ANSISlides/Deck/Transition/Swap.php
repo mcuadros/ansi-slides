@@ -27,13 +27,24 @@ class Swap extends Transition
         $a = explode(PHP_EOL, $a);
         $b = explode(PHP_EOL, $b);
 
-        for ($i = $lines; $i >= 0; $i--) {
-            $content = array_merge(
-                array_slice($a, $lines - $i, $lines),
-                array_slice($b, 0, $lines - $i)
-            );
-
-            $this->printContent(implode(PHP_EOL, $content));
+        if ($this->direction == self::DIR_BACKWARD) {
+            for ($i = 0; $i <= $lines; $i++) {
+                $this->printMix($b, $a, $i, $lines);
+            }
+        } else if ($this->direction == self::DIR_FORWARD) {
+            for ($i = $lines; $i >= 0; $i--) {
+                $this->printMix($a, $b, $i, $lines);
+            }
         }
+    }
+
+    protected function printMix($a, $b, $i, $lines)
+    {
+        $content = array_merge(
+            array_slice($a, $lines - $i, $lines),
+            array_slice($b, 0, $lines - $i)
+        );
+
+        $this->printContent(implode(PHP_EOL, $content));
     }
 }

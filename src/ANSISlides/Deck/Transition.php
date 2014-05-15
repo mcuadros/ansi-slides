@@ -6,6 +6,16 @@ use ANSISlides\Slide;
 
 abstract class Transition
 {
+    const DIR_FORWARD = 1;
+    const DIR_BACKWARD = 2;
+
+    protected $direction = self::DIR_FORWARD;
+
+    public function setDirection($direction)
+    {
+        $this->direction = $direction;
+    }
+
     abstract public function play(Slide $from = null, Slide $to, $cols, $lines);
 
     protected function printContent($content)

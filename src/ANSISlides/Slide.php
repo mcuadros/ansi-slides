@@ -51,9 +51,9 @@ class Slide
         $markdown = $this->markdown;
         $markdown = $this->analyzeStyle($markdown);
         $markdown = $this->analyzeImage($markdown);
-        $markdown = $this->analyzeHeaders($markdown);
         $markdown = $this->analyzeCodeLine($markdown);
-        //$markdown = $this->analyzeList($markdown);
+        $markdown = $this->analyzeLonglines($markdown);
+        $markdown = $this->analyzeHeaders($markdown);
 
         return $this->format($markdown);
     }
@@ -75,6 +75,9 @@ class Slide
         foreach (explode(PHP_EOL, $text) as $line) {
             $total = $this->lenWithoutStyle($line);
             $toFill = ($this->cols - $total) / 2;
+            if ($toFill < 0) {
+                $toFill = 0;
+            }
 
             $result[] = sprintf('%s%s%s',
                 str_repeat(' ', ceil($toFill)),
@@ -106,7 +109,7 @@ class Slide
         $markdown = preg_replace_callback('|(!\[(.*),(.*)\]\n)|', function($matches) {
             $this->style->fg($matches[2])->bg($matches[3]);
 
-            return '';
+            return PHP_EOL;
         }, $markdown);
 
         return preg_replace_callback('|(!\[(.*),(.*)\])(.*)|', function($matches) {
@@ -225,6 +228,18 @@ class Slide
 
             return  implode(PHP_EOL, $lines);
         }, $markdown);
+    }
+
+    protected function analyzeLonglines($markdown)
+    {
+        $lines = explode(PHP_EOL , $markdown);
+        foreach ($lines as &$line) {
+            if ($this->lenWithoutStyle($line, true) > $this->cols - 12) {
+                $line = wordwrap($line, $this->cols - 12);
+            }
+        }
+
+        return  implode(PHP_EOL, $lines);
     }
 
     protected function analyzeList($markdown)

@@ -4,9 +4,9 @@ namespace ANSISlides\Deck;
 
 class Control
 {
-    const EVENT_QUIT = 0;
-    const EVENT_NEXT = 1;
-    const EVENT_PREV = 2;
+    const EVENT_QUIT = 1;
+    const EVENT_NEXT = 2;
+    const EVENT_PREV = 3;
 
     private $stdin;
 
@@ -18,20 +18,34 @@ class Control
 
     public function wait()
     {
-        $char = fgetc($this->stdin);
-        return $this->input($char);
+        $char = '';
+        do {
+            $char .= fgetc($this->stdin);
+            $event = $this->input($char);
+        } while($event === false);
+
+        return $event;
     }
 
     private function input($char)
     {
-        if ($char == ' ') {
-            return self::EVENT_NEXT;
+        switch ($char) {
+            case "\033\033":
+            case 'q':
+                return self::EVENT_QUIT;
+            case ' ':
+            case "\n":
+            case "\033[B":
+            case "\033[C":
+                return self::EVENT_NEXT;
+            case "\033[A":
+            case "\033[D":
+                return self::EVENT_PREV;
+            case "\033":
+            case "\033[":
+                return false;
         }
 
-        if ($char == 'q') {
-            return self::EVENT_QUIT;
-        }
-
-        return self::EVENT_PREV;
+        return null;
     }
 }

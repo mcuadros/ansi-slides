@@ -16,6 +16,7 @@ class Deck
     private $slides = [];
     private $path = __DIR__;
     private $position = 0;
+    private $previuos = -1;
 
     public function __construct($markdown)
     {
@@ -69,13 +70,19 @@ class Deck
         $action = $this->control->wait();
         switch ($action) {
             case Control::EVENT_NEXT:
+                $this->previuos = $this->position;
                 $this->position++;
+                $this->transition->setDirection(Transition::DIR_FORWARD);
                 break;
             case Control::EVENT_PREV:
+                $this->previuos = $this->position;
                 $this->position--;
+                $this->transition->setDirection(Transition::DIR_BACKWARD);
                 break;
             case Control::EVENT_QUIT:
                 return false;
+            default:
+                return $this->wait();
         }
 
         if ($this->position + 1 >= $max) {
@@ -90,8 +97,8 @@ class Deck
     private function doPlay($cols, $lines)
     {
         $prev = null;
-        if (isset($this->slides[$this->position - 1])) {
-            $prev = $this->slides[$this->position - 1];
+        if (isset($this->slides[$this->previuos])) {
+            $prev = $this->slides[$this->previuos];
         }
 
         if (!isset($this->slides[$this->position])) {
