@@ -44,6 +44,8 @@ class Deck
                 case Control::EVENT_PREV:
                     $position--;
                     break;
+                case Control::EVENT_QUIT:
+                    break 2;
             }
 
             if ($position + 1 >= $max) {
@@ -62,5 +64,10 @@ class Deck
             $slide = new Slide($slideMarkdown);
             $this->slides[] = $slide;
         }
+    }
+
+    protected function cleanScreen()
+    {
+        print chr(27) . "[2J" . chr(27) . "[;H";
     }
 }

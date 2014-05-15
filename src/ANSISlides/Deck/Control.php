@@ -4,6 +4,7 @@ namespace ANSISlides\Deck;
 
 class Control
 {
+    const EVENT_QUIT = 0;
     const EVENT_NEXT = 1;
     const EVENT_PREV = 2;
 
@@ -25,6 +26,10 @@ class Control
     {
         if ($char == ' ') {
             return self::EVENT_NEXT;
+        }
+
+        if ($char == 'q') {
+            return self::EVENT_QUIT;
         }
 
         return self::EVENT_PREV;

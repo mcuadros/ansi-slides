@@ -3,8 +3,6 @@
 namespace ANSISlides;
 
 use Packaged\Figlet\Figlet;
-use JakubOnderka\PhpConsoleColor\ConsoleColor;
-use JakubOnderka\PhpConsoleHighlighter\Highlighter;
 use Malenki\Ansi;
 
 class Slide
@@ -16,10 +14,21 @@ class Slide
     private $lines;
     private $markdown;
     private $renderer;
+    private $style;
 
-    public function __construct($markdown)
-    {
+    public function __construct(
+        $markdown,
+        $foreground = 'black',
+        $background = 'yellow'
+    ) {
         $this->markdown = $markdown;
+        $this->foreground = $foreground;
+        $this->background = $background;
+
+        $this->style = new Ansi();
+        $this->style
+            ->fg($this->foreground)
+            ->bg($this->background);
     }
 
     public function render($cols, $lines)
@@ -57,7 +66,7 @@ class Slide
             $result[] = sprintf('%s%s%s',
                 str_repeat(' ', ceil($toFill)),
                 $line,
-                str_repeat(' ', floor($toFill))
+                $this->style->value(str_repeat(' ', floor($toFill)))
             );
         }
 
@@ -66,28 +75,14 @@ class Slide
 
     protected function style($markdown)
     {
-        $style = null;
-        $markdown = preg_replace_callback('|(\[(.*),(.*)\])|',
-            function($matches) use (&$style) {
-                $style = new Ansi();
-                $style->fg($matches[2])->bg($matches[3]);
-
-                return str_repeat(' ', strlen($matches[0]));
-            }
-        , $markdown);
-
-        if ($style) {
-            return $this->applyStyle($style, $markdown);
-        }
-
-        return $markdown;
+        return $this->applyStyle($markdown);
     }
 
-    protected function applyStyle(Ansi $style, $markdown)
+    protected function applyStyle($markdown)
     {
         $lines = explode(PHP_EOL, $markdown);
         foreach ($lines as &$line) {
-            $line = (string) $style->value($line);
+            $line = (string) $this->style->value($line);
         }
 
         return implode(PHP_EOL, $lines);
@@ -102,6 +97,7 @@ class Slide
             return $markdown;
         }
 
+        $this->style = new Ansi();
         $this->setBackground($matches[2]);
 
         return '';
@@ -159,12 +155,15 @@ class Slide
     protected function analyzeCodeLine($markdown)
     {
         return preg_replace_callback('|```(php)?\n(.*)```|s', function($matches) {
+            $style = new Ansi();
+            $style->bg('black');
+
             $method = 'getWholeFile';
             if ($matches[1] == 'php') {
                 $method = 'getWholeFileWithLineNumbers';
             }
 
-            $highlighter = new Highlighter(new ConsoleColor());
+            $highlighter = new Highlighter('black');
             $result = $highlighter->$method(
                 '<?php ' . PHP_EOL . trim($matches[2])
             );
@@ -180,12 +179,22 @@ class Slide
                 }
             }
 
+            $blackSpace = (string) $style->value(' ');
+            $twoBlackSpace = $blackSpace . $blackSpace;
+
             foreach ($lines as &$line) {
                 $fill = $max - $this->lenWithoutStyle($line);
-                $line .= str_repeat(' ', $fill);
+                $line = $twoBlackSpace . $line . str_repeat(' ', $fill) . $twoBlackSpace;
             }
 
-            return implode(PHP_EOL, $lines);
+            $emptyLine = str_repeat($blackSpace, $max + 4);
+            array_unshift($lines, $emptyLine);
+
+            if ($this->lenWithoutStyle(end($lines), true)) {
+                array_push($lines, $emptyLine);
+            }
+
+            return  implode(PHP_EOL, $lines);
         }, $markdown);
     }
 
@@ -210,9 +219,12 @@ class Slide
         return implode(Deck::SLIDE_DIVISOR, $output);
     }
 
-    protected function lenWithoutStyle($line)
+    protected function lenWithoutStyle($line, $trim = false)
     {
         $clean = preg_replace('/\x1b(\[|\(|\))[;?0-9]*[0-9A-Za-z]/', '', $line);
+        if ($trim) {
+            $clean = trim($clean);
+        }
 
         return mb_strlen($clean, 'UTF-8');
     }
