@@ -11,17 +11,24 @@ class Deck
 {
     const SLIDE_DIVISOR = "---\n";
 
+    private $title = 'Foo bar';
     private $control;
     private $markdown;
     private $slides = [];
     private $path = __DIR__;
     private $position = 0;
     private $previuos = -1;
+    private $showPagination;
 
     public function __construct($markdown)
     {
         $this->control = new Control();
         $this->markdown = $markdown;
+    }
+
+    public function showPagination($bool)
+    {
+        $this->showPagination = $bool;
     }
 
     public function setPath($path)
@@ -42,10 +49,14 @@ class Deck
     public function build()
     {
         $slides = explode(self::SLIDE_DIVISOR, $this->markdown);
+
         foreach($slides as $slideMarkdown) {
             $slide = new Slide($slideMarkdown);
             $slide->setPath($this->path);
             $slide->setTransition($this->transition);
+            $slide->setTotalSlides(count($slides) + 1);
+            $slide->setNumberSlide(count($this->slides) + 1);
+            $slide->showPagination($this->showPagination);
 
             $this->slides[] = $slide;
         }

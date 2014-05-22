@@ -18,6 +18,10 @@ class Slide
     private $style;
     private $path;
     private $transition;
+    private $number;
+    private $total;
+    private $hasBackground;
+    private $showPagination;
 
     public function __construct($markdown, $fg = 'black', $bg = 'yellow') {
         $this->markdown = $markdown;
@@ -26,6 +30,21 @@ class Slide
 
         $this->style = new Ansi();
         $this->style->fg($fg)->bg($bg);
+    }
+
+    public function showPagination($bool)
+    {
+        $this->showPagination = $bool;
+    }
+
+    public function setNumberSlide($number)
+    {
+        $this->number = $number;
+    }
+
+    public function setTotalSlides($total)
+    {
+        $this->total = $total;
     }
 
     public function setPath($path)
@@ -63,6 +82,7 @@ class Slide
         foreach(explode(Deck::SLIDE_DIVISOR, $markdown) as $md) {
             $md = $this->valign($md);
             $md = $this->align($md);
+            $md = $this->info($md);
             $md = $this->style($md);
 
             yield $md;
@@ -104,6 +124,34 @@ class Slide
         return implode(PHP_EOL, $lines);
     }
 
+    protected function info($markdown)
+    {
+        if (
+            !$this->showPagination ||
+            $this->number == 1 ||
+            $this->hasBackground
+        ) {
+            return $markdown;
+        }
+
+        $info = $this->callInfoLine();
+
+        $lines = explode(PHP_EOL, $markdown);
+        array_shift($lines);
+        $last = array_pop($lines);
+        $lines[] = $info;
+        $lines[] = $last;
+
+        return implode(PHP_EOL, $lines);
+    }
+
+    private function callInfoLine()
+    {
+        $pagination = sprintf('%d/%d', $this->number, $this->total);
+
+        return str_pad($pagination, $this->cols - 2, ' ', STR_PAD_LEFT) . '  ';
+    }
+
     protected function analyzeStyle($markdown)
     {
         $markdown = preg_replace_callback('|(!\[(.*),(.*)\]\n)|', function($matches) {
@@ -131,6 +179,7 @@ class Slide
 
         $this->style = new Ansi();
         $this->setBackground($matches[2]);
+        $this->hasBackground = true;
 
         return '';
     }

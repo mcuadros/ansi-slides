@@ -33,6 +33,11 @@ class Play extends BaseCommand
                null,
                InputOption::VALUE_REQUIRED,
                'Start position'
+            )->addOption(
+               'pagination',
+               null,
+               InputOption::VALUE_NONE,
+               'Enable pagination'
             )
         ;
     }
@@ -47,6 +52,7 @@ class Play extends BaseCommand
         $deck->setPath(dirname($file));
         $deck->setTransition($transition);
         $deck->setPosition((int) $input->getOption('position'));
+        $deck->showPagination((bool) $input->getOption('pagination'));
 
         $deck->build();
         $deck->play((int) exec('tput cols'), (int) exec('tput lines'));

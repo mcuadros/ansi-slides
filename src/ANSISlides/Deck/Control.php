@@ -37,9 +37,11 @@ class Control
             case "\n":
             case "\033[B":
             case "\033[C":
+            case "\033[6":
                 return self::EVENT_NEXT;
             case "\033[A":
             case "\033[D":
+            case "\033[5":
                 return self::EVENT_PREV;
             case "\033":
             case "\033[":
