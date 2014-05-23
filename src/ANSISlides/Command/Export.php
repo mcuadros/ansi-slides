@@ -31,15 +31,30 @@ class Export extends BaseCommand
             )
             ->addOption(
                'pagination',
-               null,
+               'p',
                InputOption::VALUE_NONE,
                'Enable pagination'
+            )
+            ->addOption(
+               'resolution',
+               'r',
+               InputOption::VALUE_REQUIRED,
+               'Terminal resouliton <cols>x<lines>',
+               '85x30'
             )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        list($cols, $lines) = explode('x', $input->getOption('resolution'));
+        $cols = (int) $cols;
+        $lines = (int) $lines;
+        $output->writeln(sprintf(
+            '<comment>Terminal size %dx%d</comment>',
+            $cols, $lines
+        ));
+
         $file = getcwd() . '/' . $input->getArgument('input');
         $markdown = $this->getMarkdown($file);
 
@@ -53,7 +68,7 @@ class Export extends BaseCommand
 
         $deck->build();
         do {
-            $deck->playCurrentSlide((int) exec('tput cols'), (int) exec('tput lines'));
+            $deck->playCurrentSlide($cols, $lines);
             $output->writeln(sprintf(
                 '<info>Saving slide</info> %d',
                 $deck->getCurrentPosition()
@@ -66,7 +81,7 @@ class Export extends BaseCommand
         $exporter->save($destination);
 
         $output->writeln(sprintf(
-            '<info>Deck saved to</info> "%s"',
+            '<comment>Deck saved to "%s"</comment>',
             $destination
         ));
     }

@@ -15,12 +15,26 @@
 # Que es HHVM?
 ---
 ![white,blue]
-## Implementación alternativiva de PHP.
+## Implementación alternativiva de PHP
 ![yellow,blue]* Proyecto OSS iniciado por Facebook, con una activa comunidad.
 
 ![yellow,blue]* La funcionalidad de PHP 5.4 esta soportada casi por completo
 
 ![yellow,blue]* Las principales extensions han sido portadas.
+---
+![white,blue]
+## Historia
+![yellow,blue]* Facebook tiene más 20 millones de lineas de código en PHP
+![yellow,blue]lo que hace impensable rescribirlo.
+
+![yellow,blue]* En el 2008 nace el proyecto HPHPc, a nivel interno, para
+![yellow,blue]aumentar el rendimiento de su plataforma.
+
+![yellow,blue]* En el 2010 se hace público HPHPc y se comienza con el
+![yellow,blue]desarrollo de HHVM, igualando el rendimiento de HPHPc en el 2012
+
+![yellow,blue]* En el 2013 la plataforma de Facebook empieza a usar HHVM
+![yellow,blue]y se declara obsoleto HPHPc
 ---
 ![white,blue]
 ## HipHop Virtual Machine
@@ -103,13 +117,13 @@ actualización 2014-05-21
                └──┤   Parsing   │
                   └──────┬──────┘
                   ┌──────┴──────┐      ┌──────────────┐
-                  │ Compilation ├──────┤ JIT Compiler │
+                  │ Compilation ├──────┤  OpCode Gen. │
                   └─────────────┘      └──────┬───────┘
                                        ┌──────┴───────┐
-                                       │  Code Repo.  │
+                                       │ JIT Compiler │
                                        └──────┬───────┘
                   ┌─────────────┐      ┌──────┴───────┐
-                  │  Execution  ├──────┤  Code Repo.  │
+                  │  Execution  ├──────┤ x64 Code Re. │
                   └─────────────┘      └──────────────┘
 ```
 ElePHPants on speed: Running TYPO3 Flow on HipHop VM
