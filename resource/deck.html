@@ -1,0 +1,30 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+
+        <!-- jQuery + history plugin -->
+        <script type="text/javascript" src="http://slides.seld.be/jquery.min.js"></script>
+        <script type="text/javascript" src="http://slides.seld.be/jquery.history.js"></script>
+
+        <!-- Slippy core js file -->
+        <script type="text/javascript" src="http://slides.seld.be/slippy.js"></script>
+
+        <!-- Slippy structural styles -->
+        <link type="text/css" rel="stylesheet" href="http://slides.seld.be/slippy.css"/>
+
+        <!-- Slippy theme (feel free to change it) -->
+        <link type="text/css" rel="stylesheet" href="http://slides.seld.be/slippy-pure.css"/>
+        <style>
+            %s
+        </style>
+    </head>
+    <body>
+        %s
+        <script type="text/javascript">
+            $(function() {
+                $(".slide").slippy({});
+                SyntaxHighlighter.all();
+            });
+        </script>
+    </body>
+</html>

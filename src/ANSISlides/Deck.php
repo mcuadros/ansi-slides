@@ -11,7 +11,6 @@ class Deck
 {
     const SLIDE_DIVISOR = "---\n";
 
-    private $title = 'Foo bar';
     private $control;
     private $markdown;
     private $slides = [];
@@ -69,43 +68,13 @@ class Deck
         }
 
         do {
-            $this->doPlay($cols, $lines);
+            $this->playCurrentSlide($cols, $lines);
         } while($this->wait());
 
         $this->cleanScreen();
     }
 
-    private function wait()
-    {
-        $max = count($this->slides);
-        $action = $this->control->wait();
-        switch ($action) {
-            case Control::EVENT_NEXT:
-                $this->previuos = $this->position;
-                $this->position++;
-                $this->transition->setDirection(Transition::DIR_FORWARD);
-                break;
-            case Control::EVENT_PREV:
-                $this->previuos = $this->position;
-                $this->position--;
-                $this->transition->setDirection(Transition::DIR_BACKWARD);
-                break;
-            case Control::EVENT_QUIT:
-                return false;
-            default:
-                return $this->wait();
-        }
-
-        if ($this->position + 1 >= $max) {
-            $this->position = $max - 1;
-        } else if ($this->position < 0) {
-            $this->position = 0;
-        }
-
-        return true;
-    }
-
-    private function doPlay($cols, $lines)
+    public function playCurrentSlide($cols, $lines)
     {
         $prev = null;
         if (isset($this->slides[$this->previuos])) {
@@ -119,6 +88,55 @@ class Deck
         }
 
         $this->slides[$this->position]->play($cols, $lines, $prev);
+    }
+
+    private function wait()
+    {
+        $action = $this->control->wait();
+        switch ($action) {
+            case Control::EVENT_NEXT:
+                $this->next();
+                break;
+            case Control::EVENT_PREV:
+                $this->prev();
+                break;
+            case Control::EVENT_QUIT:
+                return false;
+            default:
+                return $this->wait();
+        }
+
+        if ($this->isEndReached()) {
+            $this->position = count($this->slides) - 1;
+        } else if ($this->position < 0) {
+            $this->position = 0;
+        }
+
+        return true;
+    }
+
+    public function next()
+    {
+        $this->previuos = $this->position;
+        $this->position++;
+        $this->transition->setDirection(Transition::DIR_FORWARD);
+    }
+
+    public function prev()
+    {
+        $this->previuos = $this->position;
+        $this->position--;
+        $this->transition->setDirection(Transition::DIR_BACKWARD);
+    }
+
+    public function isEndReached()
+    {
+        return $this->getCurrentPosition() >= count($this->slides);
+    }
+
+    public function getCurrentPosition()
+    {
+        return $this->position + 1;
     }
 
     protected function cleanScreen()

@@ -16,7 +16,8 @@
         "packaged/figlet": "dev-master",
         "malenki/ansi": "1.2.6",
         "jakub-onderka/php-console-highlighter": "0.*",
-        "symfony/console": "v2.4.4"
+        "symfony/console": "v2.4.4",
+        "sensiolabs/ansi-to-html": "v1.0.3"
     },
     "autoload": {
         "psr-0": { "ANSISlides": "src/" }

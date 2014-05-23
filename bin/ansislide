@@ -8,4 +8,5 @@ use Symfony\Component\Console\Application;
 
 $app = new Application('ANSIslides', '1.0');
 $app->add(new Command\Play);
+$app->add(new Command\Export);
 $app->run();
