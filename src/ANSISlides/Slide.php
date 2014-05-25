@@ -3,7 +3,7 @@
 namespace ANSISlides;
 
 use Packaged\Figlet\Figlet;
-use Malenki\Ansi;
+use JakubOnderka\PhpConsoleColor\ConsoleColor;
 use ANSISlides\Deck\Transition;
 use ANSISlides\Slide\Frame;
 
@@ -16,22 +16,23 @@ class Slide
     private $lines;
     private $markdown;
     private $renderer;
-    private $style;
+    private $color;
     private $path;
     private $transition;
     private $number;
     private $total;
     private $hasBackground;
     private $showPagination;
+    private $background;
+    private $foreground;
 
     public function __construct($markdown, $fg = 'black', $bg = 'yellow') {
         $this->markdown = $markdown;
         $this->foreground = $fg;
-        $this->background = $bg;
+        $this->background = 'bg_' . $bg;
         $this->transition = new Transition\None();
 
-        $this->style = new Ansi();
-        $this->style->fg($fg)->bg($bg);
+        $this->color = new ConsoleColor();
     }
 
     public function showPagination($bool)
@@ -70,11 +71,11 @@ class Slide
         $this->lines = $lines;
 
         $markdown = $this->markdown;
-        $markdown = $this->analyzeStyle($markdown);
         $markdown = $this->analyzeImage($markdown);
         $markdown = $this->analyzeCodeLine($markdown);
         $markdown = $this->analyzeLonglines($markdown);
         $markdown = $this->analyzeHeaders($markdown);
+        $markdown = $this->analyzeStyle($markdown);
 
         return $this->format($markdown);
     }
@@ -104,7 +105,7 @@ class Slide
             $result[] = sprintf('%s%s%s',
                 str_repeat(' ', ceil($toFill)),
                 $line,
-                $this->style->value(str_repeat(' ', floor($toFill)))
+                $this->applyColor(str_repeat(' ', floor($toFill)))
             );
         }
 
@@ -120,7 +121,7 @@ class Slide
     {
         $lines = explode(PHP_EOL, $markdown);
         foreach ($lines as &$line) {
-            $line = (string) $this->style->value($line);
+            $line = $this->applyColor($line);
         }
 
         return implode(PHP_EOL, $lines);
@@ -157,16 +158,16 @@ class Slide
     protected function analyzeStyle($markdown)
     {
         $markdown = preg_replace_callback('|(!\[(.*),(.*)\]\n)|', function($matches) {
-            $this->style->fg($matches[2])->bg($matches[3]);
+            $this->foreground = $matches[2];
+            $this->background = 'bg_' . $matches[3];
 
             return PHP_EOL;
         }, $markdown);
 
         return preg_replace_callback('|(!\[(.*),(.*)\])(.*)|', function($matches) {
-            $style = new Ansi();
-            $style->fg($matches[2])->bg($matches[3]);
+            $style = [$matches[2], 'bg_' . $matches[3]];
 
-            return '' . $style->value($matches[4]);
+            return $this->color->apply($style, $matches[4]);
         }, $markdown);
     }
 
@@ -179,7 +180,9 @@ class Slide
             return $markdown;
         }
 
-        $this->style = new Ansi();
+        $this->foreground = 'default';
+        $this->background = 'bg_default';
+
         $this->setBackground($matches[2]);
         $this->hasBackground = true;
 
@@ -238,9 +241,6 @@ class Slide
     protected function analyzeCodeLine($markdown)
     {
         return preg_replace_callback('|```(php)?\n(.*)```|s', function($matches) {
-            $style = new Ansi();
-            $style->bg('black');
-
             $method = 'getWholeFile';
             if ($matches[1] == 'php') {
                 $method = 'getWholeFileWithLineNumbers';
@@ -262,7 +262,7 @@ class Slide
                 }
             }
 
-            $blackSpace = (string) $style->value(' ');
+            $blackSpace = $this->color->apply('bg_black', ' ');
             $twoBlackSpace = $blackSpace . $blackSpace;
 
             foreach ($lines as &$line) {
@@ -286,11 +286,23 @@ class Slide
         $lines = explode(PHP_EOL , $markdown);
         foreach ($lines as &$line) {
             if ($this->lenWithoutStyle($line, true) > $this->cols - 12) {
-                $line = wordwrap($line, $this->cols - 12);
+                $line = $this->wordWrapLine($line, $this->cols - 12);
             }
         }
 
         return  implode(PHP_EOL, $lines);
+    }
+
+    private function wordWrapLine($text)
+    {
+        preg_match('|(!\[.*\])?(.*)|', $text, $matches);
+        if (strlen($matches[2]) > $this->cols - 12) {
+            $break = PHP_EOL . $matches[1];
+
+            return $matches[1] . wordwrap($matches[2], $this->cols - 12, $break);
+        }
+
+        return $text;
     }
 
     protected function lenWithoutStyle($line, $trim = false)
@@ -314,5 +326,15 @@ class Slide
             $text,
             str_repeat($line.PHP_EOL, floor($toFill))
         );
+    }
+
+    protected function applyColor($value, $extra = null)
+    {
+        $style = [$this->foreground, $this->background];
+        if ($extra) {
+            $style[] = $extra;
+        }
+
+        return $this->color->apply($style, $value);
     }
 }

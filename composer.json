@@ -14,8 +14,8 @@
     "require": {
         "php": ">=5.4.0",
         "packaged/figlet": "dev-master",
-        "malenki/ansi": "1.2.6",
         "jakub-onderka/php-console-highlighter": "0.*",
+        "jakub-onderka/php-console-color": "0.*",
         "symfony/console": "v2.4.4",
         "sensiolabs/ansi-to-html": "v1.0.3"
     },
