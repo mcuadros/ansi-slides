@@ -48,10 +48,13 @@ class Play extends BaseCommand
         $markdown = $this->getMarkdown($file);
         $transition = $this->getTransition($input);
 
-        $deck = new Deck($markdown);
+        $deck = new Deck(md5($file), $markdown);
         $deck->setPath(dirname($file));
         $deck->setTransition($transition);
-        $deck->setPosition((int) $input->getOption('position'));
+        if ($input->getOption('position')) {
+          $deck->setPosition((int) $input->getOption('position'));
+        }
+
         $deck->showPagination((bool) $input->getOption('pagination'));
 
         $deck->build();

@@ -11,6 +11,7 @@ class Deck
 {
     const SLIDE_DIVISOR = "---\n";
 
+    private $id;
     private $control;
     private $markdown;
     private $slides = [];
@@ -19,10 +20,23 @@ class Deck
     private $previuos = -1;
     private $showPagination;
 
-    public function __construct($markdown)
+    public function __construct($id, $markdown)
     {
+        $this->id = $id;
         $this->control = new Control();
         $this->markdown = $markdown;
+
+        $this->position = $this->getPositionFromCache();
+    }
+
+    private function getPositionFromCache()
+    {
+        $cache = sys_get_temp_dir() . '/ansislides/' . $this->id;
+        if (file_exists($cache)) {
+            return (int) file_get_contents($cache);
+        }
+
+        return 0;
     }
 
     public function showPagination($bool)
@@ -83,7 +97,7 @@ class Deck
             return $token;
         }, $slideMarkdown);
 
-        if (!$tokens) {
+        if (!$tokens || $this->transition instanceOf Transition\Export) {
             return [$slideMarkdown];
         }
 
@@ -152,6 +166,17 @@ class Deck
         }
 
         $this->slides[$this->position]->play($cols, $lines, $prev);
+        $this->savePositionToCache();
+    }
+
+    private function savePositionToCache()
+    {
+        $path = sys_get_temp_dir() . '/ansislides/';
+        if (!file_exists($path)) {
+            mkdir($path);
+        }
+
+        file_put_contents($path . $this->id, $this->position);
     }
 
     private function wait()

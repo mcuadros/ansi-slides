@@ -61,9 +61,10 @@ class Export extends BaseCommand
         $exporter = new Exporter();
         $transition = new Transition\Export($exporter);
 
-        $deck = new Deck($markdown);
+        $deck = new Deck(md5($file), $markdown);
         $deck->setPath(dirname($file));
         $deck->setTransition($transition);
+        $deck->setPosition(0);
         $deck->showPagination((bool) $input->getOption('pagination'));
 
         $deck->build();
