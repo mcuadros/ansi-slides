@@ -71,6 +71,7 @@ class Slide
         $this->lines = $lines;
 
         $markdown = $this->markdown;
+        $markdown = $this->analyzeEmphasis($markdown);
         $markdown = $this->analyzeImage($markdown);
         $markdown = $this->analyzeCodeLine($markdown);
         $markdown = $this->analyzeLonglines($markdown);
@@ -169,6 +170,19 @@ class Slide
 
             return $this->color->apply($style, $matches[4]);
         }, $markdown);
+    }
+
+    protected function analyzeEmphasis($markdown)
+    {
+        $markdown = preg_replace_callback('|[*_]{2}(.*?)[*_]{2}|', function($matches) {
+            return "\033[4m" . $matches[1] . "\033[24m";
+        }, $markdown);
+
+        $markdown = preg_replace_callback('|[*_](.*?)[*_]|', function($matches) {
+            return "\033[1m" . $matches[1] . "\033[21m";
+        }, $markdown);
+
+        return $markdown;
     }
 
     protected function analyzeImage($markdown)
@@ -328,12 +342,9 @@ class Slide
         );
     }
 
-    protected function applyColor($value, $extra = null)
+    protected function applyColor($value)
     {
         $style = [$this->foreground, $this->background];
-        if ($extra) {
-            $style[] = $extra;
-        }
 
         return $this->color->apply($style, $value);
     }

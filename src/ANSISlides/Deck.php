@@ -76,7 +76,7 @@ class Deck
     protected function analyzeList($slideMarkdown)
     {
         $tokens = [];
-        $markdown = preg_replace_callback('|((!\[.*\])?)(\* .*)|', function($matches) use (&$tokens) {
+        $markdown = preg_replace_callback('|((!\[.*\])?)(\- .*)|', function($matches) use (&$tokens) {
             $token = uniqid();
             $tokens[$token] = $matches[0];
 
