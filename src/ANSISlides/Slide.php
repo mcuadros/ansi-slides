@@ -5,6 +5,7 @@ namespace ANSISlides;
 use Packaged\Figlet\Figlet;
 use Malenki\Ansi;
 use ANSISlides\Deck\Transition;
+use ANSISlides\Slide\Frame;
 
 class Slide
 {
@@ -27,6 +28,7 @@ class Slide
         $this->markdown = $markdown;
         $this->foreground = $fg;
         $this->background = $bg;
+        $this->transition = new Transition\None();
 
         $this->style = new Ansi();
         $this->style->fg($fg)->bg($bg);
@@ -246,7 +248,7 @@ class Slide
 
             $highlighter = new Highlighter('black');
             $result = $highlighter->$method(
-                '<?php ' . PHP_EOL . trim($matches[2])
+                '<?php ' . PHP_EOL . trim($matches[2], "\t\n\r")
             );
 
             $block = substr($result, strpos($result, PHP_EOL) + 1);
@@ -289,27 +291,6 @@ class Slide
         }
 
         return  implode(PHP_EOL, $lines);
-    }
-
-    protected function analyzeList($markdown)
-    {
-        $tokens = [];
-        $markdown = preg_replace_callback('|\* (.*)|', function($matches) use (&$tokens) {
-            $token = uniqid();
-            $tokens[$token] = $matches[1];
-            return $token;
-        }, $markdown);
-
-        if (!$tokens) {
-            return $markdown;
-        }
-
-        $output = [];
-        foreach ($tokens as $token => $value) {
-            $output[] = str_replace($token, $value, $markdown);
-        }
-
-        return implode(Deck::SLIDE_DIVISOR, $output);
     }
 
     protected function lenWithoutStyle($line, $trim = false)

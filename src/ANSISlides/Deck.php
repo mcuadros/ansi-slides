@@ -50,15 +50,79 @@ class Deck
         $slides = explode(self::SLIDE_DIVISOR, $this->markdown);
 
         foreach($slides as $slideMarkdown) {
-            $slide = new Slide($slideMarkdown);
-            $slide->setPath($this->path);
-            $slide->setTransition($this->transition);
-            $slide->setTotalSlides(count($slides) + 1);
-            $slide->setNumberSlide(count($this->slides) + 1);
-            $slide->showPagination($this->showPagination);
+            $slideMarkdown = $this->prepareMarkdown($slideMarkdown);
+            $i = 0;
+            foreach ($slideMarkdown as $subSlideMarkdown) {
+                $slide = $this->buildSlide($subSlideMarkdown);
+                if ($i++ == 0) {
+                    $slide->setTransition($this->transition);
+                }
 
-            $this->slides[] = $slide;
+                $slide->setTotalSlides(count($slides) + 1);
+                $slide->setNumberSlide(count($this->slides) + 1);
+
+                $this->slides[] = $slide;
+            }
         }
+    }
+
+    private function prepareMarkdown($markdown)
+    {
+        $slides = $this->analyzeList($markdown);
+
+        return $slides;
+    }
+
+    protected function analyzeList($slideMarkdown)
+    {
+        $tokens = [];
+        $markdown = preg_replace_callback('|((!\[.*\])?)(\* .*)|', function($matches) use (&$tokens) {
+            $token = uniqid();
+            $tokens[$token] = $matches[0];
+
+            return $token;
+        }, $slideMarkdown);
+
+        if (!$tokens) {
+            return [$slideMarkdown];
+        }
+
+        $output = []; $keys = array_keys($tokens);
+        $max = count($tokens);
+        for ($i=0;$i<$max;$i++) {
+            $tmp = explode($keys[$i], $markdown);
+            $newSlide = $tmp[0] . $keys[$i];
+
+            if ($i == 0) {
+                $clean = preg_replace('|(!\[.*\])|', '', $tmp[0]);
+                if (strlen(trim($clean)) != 0) {
+                    $output[] = $tmp[0];
+                }
+
+                $newSlide .= PHP_EOL;
+            } else if ($i == $max-1) {
+                $newSlide .= $tmp[1];
+            } else {
+                $newSlide .= PHP_EOL;
+            }
+
+            foreach ($tokens as $token => $value) {
+                $newSlide = str_replace($token, $value, $newSlide);
+            }
+
+            $output[] = $newSlide;
+        }
+
+        return $output;
+    }
+
+    private function buildSlide($markdown)
+    {
+        $slide = new Slide($markdown);
+        $slide->setPath($this->path);
+        $slide->showPagination($this->showPagination);
+
+        return $slide;
     }
 
     public function play($cols, $lines)
