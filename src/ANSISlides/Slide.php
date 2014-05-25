@@ -217,22 +217,22 @@ class Slide
 
     protected function analyzeHeaders($markdown)
     {
-        return preg_replace_callback('|(#+) (.*)|', function($matches) {
-            switch ($matches[1]) {
+        return preg_replace_callback('|(!\[.*\])?(#+) (.*)|', function($matches) {
+            switch ($matches[2]) {
                 case '#':
-                    $result = Figlet::create($matches[2], '../../../../../fonts/ansi');                    break;
+                    $result = Figlet::create($matches[3], '../../../../../fonts/ansi');                    break;
                 case '##':
-                    $result = $this->drawSecondaryHeader($matches[2]);
+                    $result = $this->drawSecondaryHeader($matches[3]);
                     break;
                 default:
-                    $result = $matches[2];
+                    $result = $matches[3];
                     break;
             }
 
             $output = '';
             foreach (explode(PHP_EOL, $result) as $line) {
                 if (strlen(trim($line)) != 0) {
-                    $output .= $line . PHP_EOL;
+                    $output .= $matches[1] . $line . PHP_EOL;
                 }
             }
 
