@@ -101,31 +101,24 @@ class Deck
             return [$slideMarkdown];
         }
 
-        $output = []; $keys = array_keys($tokens);
+        $output = [];
+        $keys = array_keys($tokens);
         $max = count($tokens);
-        for ($i=0;$i<$max;$i++) {
-            $tmp = explode($keys[$i], $markdown);
-            $newSlide = $tmp[0] . $keys[$i];
-
-            if ($i == 0) {
-                $clean = preg_replace('|(!\[.*\])|', '', $tmp[0]);
-                if (strlen(trim($clean)) != 0) {
-                    $output[] = $tmp[0];
-                }
-
-                $newSlide .= PHP_EOL;
-            } else if ($i == $max-1) {
-                $newSlide .= $tmp[1];
-            } else {
-                $newSlide .= PHP_EOL;
-            }
+        for ($i=-1;$i<$max-1;$i++) {
+            $tmp = explode($keys[$i+1], $markdown);
+            $newSlide = $tmp[0];
 
             foreach ($tokens as $token => $value) {
                 $newSlide = str_replace($token, $value, $newSlide);
             }
 
-            $output[] = $newSlide;
+            $clean = preg_replace('|(!\[.*\])|', '', $newSlide);
+            if (strlen(trim($clean))) {
+                $output[] = $newSlide;
+            }
         }
+
+        $output[] = $slideMarkdown;
 
         return $output;
     }

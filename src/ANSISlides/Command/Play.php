@@ -52,7 +52,7 @@ class Play extends BaseCommand
         $deck->setPath(dirname($file));
         $deck->setTransition($transition);
         if ($input->getOption('position')) {
-          $deck->setPosition((int) $input->getOption('position'));
+            $deck->setPosition((int) $input->getOption('position'));
         }
 
         $deck->showPagination((bool) $input->getOption('pagination'));

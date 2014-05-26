@@ -73,10 +73,10 @@ class Slide
         $markdown = $this->markdown;
         $markdown = $this->analyzeEmphasis($markdown);
         $markdown = $this->analyzeImage($markdown);
-        $markdown = $this->analyzeCodeLine($markdown);
         $markdown = $this->analyzeLonglines($markdown);
         $markdown = $this->analyzeHeaders($markdown);
         $markdown = $this->analyzeStyle($markdown);
+        $markdown = $this->analyzeCodeBlock($markdown);
 
         return $this->format($markdown);
     }
@@ -159,14 +159,17 @@ class Slide
     protected function analyzeStyle($markdown)
     {
         $markdown = preg_replace_callback('|(!\[(.*),(.*)\]\n)|', function($matches) {
-            $this->foreground = $matches[2];
-            $this->background = 'bg_' . $matches[3];
+            $this->foreground = $this->clearStyle($matches[2]);
+            $this->background = 'bg_' . $this->clearStyle($matches[3]);
 
             return PHP_EOL;
         }, $markdown);
 
-        return preg_replace_callback('|(!\[(.*),(.*)\])(.*)|', function($matches) {
-            $style = [$matches[2], 'bg_' . $matches[3]];
+        return preg_replace_callback('|(!\[(.*?),(.*?)\])(.*)|', function($matches) {
+            $style = [
+                $this->clearStyle($matches[2]),
+                'bg_' . $this->clearStyle($matches[3])
+            ];
 
             return $this->color->apply($style, $matches[4]);
         }, $markdown);
@@ -174,11 +177,11 @@ class Slide
 
     protected function analyzeEmphasis($markdown)
     {
-        $markdown = preg_replace_callback('|[*_]{2}(.*?)[*_]{2}|', function($matches) {
+        $markdown = preg_replace_callback('|[*]{2}(.*?)[*]{2}|', function($matches) {
             return "\033[4m" . $matches[1] . "\033[24m";
         }, $markdown);
 
-        $markdown = preg_replace_callback('|[*_](.*?)[*_]|', function($matches) {
+        $markdown = preg_replace_callback('|[*](.*?)[*]|', function($matches) {
             return "\033[1m" . $matches[1] . "\033[21m";
         }, $markdown);
 
@@ -252,20 +255,14 @@ class Slide
         return implode(PHP_EOL, $line);
     }
 
-    protected function analyzeCodeLine($markdown)
+    protected function analyzeCodeBlock($markdown)
     {
         return preg_replace_callback('|```(php)?\n(.*)```|s', function($matches) {
-            $method = 'getWholeFile';
+            $block = $matches[2];
             if ($matches[1] == 'php') {
-                $method = 'getWholeFileWithLineNumbers';
+                $block = $this->prepareCodeBlockPHP($block);
             }
 
-            $highlighter = new Highlighter('black');
-            $result = $highlighter->$method(
-                '<?php ' . PHP_EOL . trim($matches[2], "\t\n\r")
-            );
-
-            $block = substr($result, strpos($result, PHP_EOL) + 1);
             $lines = explode(PHP_EOL , $block);
 
             $max = 0;
@@ -291,8 +288,18 @@ class Slide
                 array_push($lines, $emptyLine);
             }
 
-            return  implode(PHP_EOL, $lines);
+            return implode(PHP_EOL, $lines);
         }, $markdown);
+    }
+
+    protected function prepareCodeBlockPHP($markdown)
+    {
+        $highlighter = new Highlighter('black');
+        $result = $highlighter->getWholeFileWithLineNumbers(
+            '<?php ' . PHP_EOL . trim($markdown, "\t\n\r")
+        );
+
+        return substr($result, strpos($result, PHP_EOL) + 1);
     }
 
     protected function analyzeLonglines($markdown)
@@ -321,12 +328,17 @@ class Slide
 
     protected function lenWithoutStyle($line, $trim = false)
     {
-        $clean = preg_replace('/\x1b(\[|\(|\))[;?0-9]*[0-9A-Za-z]/', '', $line);
+        $clean = $this->clearStyle($line);
         if ($trim) {
             $clean = trim($clean);
         }
 
         return mb_strlen($clean, 'UTF-8');
+    }
+
+    protected function clearStyle($line)
+    {
+        return preg_replace('/\x1b(\[|\(|\))[;?0-9]*[0-9A-Za-z]/', '', $line);
     }
 
     protected function valign($text)
