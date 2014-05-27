@@ -73,9 +73,9 @@ class Slide
         $markdown = $this->markdown;
         $markdown = $this->analyzeEmphasis($markdown);
         $markdown = $this->analyzeImage($markdown);
-        $markdown = $this->analyzeLonglines($markdown);
         $markdown = $this->analyzeHeaders($markdown);
         $markdown = $this->analyzeStyle($markdown);
+        $markdown = $this->analyzeLonglines($markdown);
         $markdown = $this->analyzeCodeBlock($markdown);
 
         return $this->format($markdown);
@@ -165,7 +165,7 @@ class Slide
             return PHP_EOL;
         }, $markdown);
 
-        return preg_replace_callback('|(!\[(.*?),(.*?)\])(.*)|', function($matches) {
+        return preg_replace_callback('|(!\[([a-z_]*),([a-z_]*)\])\((.*?)\)|', function($matches) {
             $style = [
                 $this->clearStyle($matches[2]),
                 'bg_' . $this->clearStyle($matches[3])
@@ -190,7 +190,7 @@ class Slide
 
     protected function analyzeImage($markdown)
     {
-        preg_match('|\!\[(.*)\]\((.*)\)|', $markdown, $matches);
+        preg_match('|\!\[(\w)\]\((.*)\)|', $markdown, $matches);
         if (!$matches) {
             $this->clearBackground();
 
