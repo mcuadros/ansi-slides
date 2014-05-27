@@ -26,7 +26,7 @@ class Slide
     private $background;
     private $foreground;
 
-    public function __construct($markdown, $fg = 'black', $bg = 'yellow') {
+    public function __construct($markdown, $fg = 'light_yellow', $bg = 'dark_gray') {
         $this->markdown = $markdown;
         $this->foreground = $fg;
         $this->background = 'bg_' . $bg;
@@ -261,6 +261,10 @@ class Slide
             $block = $matches[2];
             if ($matches[1] == 'php') {
                 $block = $this->prepareCodeBlockPHP($block);
+                $style = 'black';
+            } else {
+                $block = $this->prepareTextBlockPHP($block);
+                $style = [$this->foreground, $this->background];
             }
 
             $lines = explode(PHP_EOL , $block);
@@ -273,7 +277,8 @@ class Slide
                 }
             }
 
-            $blackSpace = $this->color->apply('bg_black', ' ');
+            $blackSpace = $this->color->apply($style, ' ');
+
             $twoBlackSpace = $blackSpace . $blackSpace;
 
             foreach ($lines as &$line) {
@@ -290,6 +295,21 @@ class Slide
 
             return implode(PHP_EOL, $lines);
         }, $markdown);
+    }
+
+    protected function prepareTextBlockPHP($markdown)
+    {
+        $style = [
+            'white',
+            $this->background
+        ];
+
+        $lines = explode(PHP_EOL , $markdown);
+        foreach ($lines as &$line) {
+            $line = $this->color->apply($style, $line);
+        }
+
+        return implode(PHP_EOL, $lines);
     }
 
     protected function prepareCodeBlockPHP($markdown)
@@ -311,7 +331,7 @@ class Slide
             }
         }
 
-        return  implode(PHP_EOL, $lines);
+        return implode(PHP_EOL, $lines);
     }
 
     private function wordWrapLine($text)
