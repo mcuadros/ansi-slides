@@ -19,6 +19,7 @@ class Deck
     private $position = 0;
     private $previuos = -1;
     private $showPagination;
+    private $slideInScreen;
 
     public function __construct($id, $markdown)
     {
@@ -158,8 +159,15 @@ class Deck
             ));
         }
 
-        $this->slides[$this->position]->play($cols, $lines, $prev);
+        $slide = $this->slides[$this->position];
+        if ($this->slideInScreen === $slide) {
+            return;
+        }
+
+        $slide->play($cols, $lines, $prev);
         $this->savePositionToCache();
+
+        $this->slideInScreen = $slide;
     }
 
     private function savePositionToCache()
