@@ -1,12 +1,10 @@
 # headers
----
+
 ## small headers
----
 ![white,dark_gray](Texts in )![red,dark_gray](many )![green,dark_gray](colors)
 
----
 Emphasis: **underline**
----
+
 ```php
 class BlockOfCode {
     public function __construct() {
@@ -16,13 +14,14 @@ class BlockOfCode {
 
 $obj = new BlockOfCode();
 ```
----
-![white,blue]
-## Default background and color
----
+
 - Lists
 - Items are showed
 - One by one
+
 ---
 ![Portada](images/desymfonyday.008.jpg)
+
 ---
+![white,blue]
+## Default background and color
