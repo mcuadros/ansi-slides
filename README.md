@@ -3,7 +3,7 @@ ANSISlides
 
 ANSISlides is a Terminal presentation application written in PHP.
 
-The motivation of this tools was made shomething fun and fresh for my presentation in the ![deSymfonyDay 2014](http://day.desymfony.com/).
+The motivation of this tools was made shomething fun and fresh for my presentation in the [deSymfonyDay 2014](http://day.desymfony.com/).
 
 The abstraction not is very good for lack of time. Don't judge me for this code.
 
@@ -39,14 +39,14 @@ The format of the presentations is something similar to Markdown, with some tric
 # Header
 ```
 
-![Header](images/header.png)
+![Header](example/images/header.png)
 
 ## Small headers
 ```
 ## Small headers
 ```
 
-![Small header](images/small_header.png)
+![Small header](example/images/small_header.png)
 
 ## Code Highlighting
 ```
@@ -59,9 +59,10 @@ class BlockOfCode {
 
 $obj = new BlockOfCode();
 ```
+
 ```
 
-![Small header](images/blockcode.png)
+![Blockcode](example/images/blockcode.png)
 
 License
 -------
