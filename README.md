@@ -1,7 +1,7 @@
 ANSISlides
-==============================
+==========
 
-ANSISlides is a Terminal presentation application written in PHP.
+ANSISlides is a Terminal presentation application written in PHP. Bored of presentations in Keynote or PowerPoint? Give a chance to ANSISlides.
 
 The motivation of this tools was made shomething fun and fresh for my presentation in the [deSymfonyDay 2014](http://day.desymfony.com/). The abstraction not is very good for lack of time. Don't judge me for this code.
 
