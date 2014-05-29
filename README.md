@@ -47,8 +47,7 @@ The format of the presentations is something similar to Markdown, with some tric
 ![Small header](example/images/small_header.png)
 
 ### Code Highlighting
-<pre lang="no-highlight"><code>
-```php
+<pre lang="no-highlight"><code>```php
 class BlockOfCode {
     public function __construct() {
         $this->foo = 2;
