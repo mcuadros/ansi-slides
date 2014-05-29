@@ -30,7 +30,7 @@ Usage
 Format
 ------
 
-The format of the presentations is something similar to Markdown, with some tricks and hacks.
+The format of the presentations is something similar to Markdown, with some tricks and hacks. A [example file](https://raw.githubusercontent.com/mcuadros/ansi-slides/master/example/example.md) can be find at example folder or you can check a [real presentation](https://raw.githubusercontent.com/mcuadros/presentations/master/deSymfonyDay_2014/hhvm.md)
 
 ### Headers
 ```
@@ -64,7 +64,6 @@ $obj = new BlockOfCode();
 ### ANSI Colors
 ```
 ![white,dark_gray](Texts in )![red,dark_gray](many )![green,dark_gray](colors)
-
 ```
 
 ![Colors](example/images/colors.png)
@@ -72,7 +71,6 @@ $obj = new BlockOfCode();
 ### Emphasis
 ```
 Emphasis: **underline**
-
 ```
 
 ![Colors](example/images/emphasis.png)
@@ -82,7 +80,6 @@ Emphasis: **underline**
 - Lists
 - Items are showed
 - One by one
-
 ```
 
 ![Colors](example/images/list.png)
