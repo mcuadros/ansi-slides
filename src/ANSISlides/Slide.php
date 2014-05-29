@@ -190,7 +190,7 @@ class Slide
 
     protected function analyzeImage($markdown)
     {
-        preg_match('|\!\[(\w)\]\((.*)\)|', $markdown, $matches);
+        preg_match('|\!\[([^,]*)\]\((.*)\)|', $markdown, $matches);
         if (!$matches) {
             $this->clearBackground();
 

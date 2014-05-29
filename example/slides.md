@@ -1,6 +1,6 @@
-# The Hitchhiker's
-# Guide to the HHVM
-## Por Máximo Cuadros / @mcuadros_
+![Portada](images/desymfonyday.003.jpg)
+---
+![Patrocinadores](images/desymfonyday.008.jpg)
 ---
 # Quien os habla?
 Máximo Cuadros
@@ -210,14 +210,16 @@ Alias de tipos
 ## El core esta divido
 
 - (2/Nov/2013) **Joe Watkins** #9 567 commits**
-![white,dark_gray](#php: sorry, tired of arguing with strangers, tired of disappointment ... I'm out ...)
+![white,dark_gray](#php: sorry, tired of arguing with strangers, tired of disappointment ...)
+![white,dark_gray](I'm out ...)
 
 - (3/Sep/2013) **Anthony Ferrara** #39 45 commits
-![white,dark_gray](That's it. I quit. Tomorrow I'm going to retract all of my RFCs, and wish PHP a good life. I can't deal with this any more... #cya)
+![white,dark_gray](That's it. I quit. Tomorrow I'm going to retract all of my RFCs, and wish)
+![white,dark_gray](PHP a good life. I can't deal with this any more... #cya)
 ---
 ## Y algo tiene que cambiar
 
-- HHVM es un gran **toque de atención**. Una de las empresas más grandes de internet esta dedicando mucho esfuerzo para mejorar PHP.
+- HHVM es un gran **toque de atención**. Una de las empresas más grandes de internet esta dedicando mucho esfuerzo y dinero para mejorar PHP.
 
 - **No es el único** interprete alternativo kPHP, HippyVM, JPHP.
 
@@ -228,17 +230,25 @@ Alias de tipos
 - Return Type Declarations
 ![white,dark_gray](https://wiki.php.net/rfc/returntypehinting)
 
-- Array Of
-![white,dark_gray](https://wiki.php.net/rfc/arrayof)
-
 - Constructor Promoted Arguments
 ![white,dark_gray](https://wiki.php.net/rfc/constructor-promotion)
+
+- Nombres de funciones consistentes
+![white,dark_gray](https://wiki.php.net/rfc/consistent-names)
+
+- PHP-CPP: Creación de extensiones de una manera facil.
+![white,dark_gray](http://www.php-cpp.com)
 
 - PHPNG: Una vuelta de tuerca de Zend Engine para 5.7
 ![white,dark_gray](https://wiki.php.net/phpng)
 ---
-## Gracias a la comunidad!
----
-![deSymfony 2013](images/9151048607_b5a552c4dd_c.jpg)
----
 # Preguntas?
+---
+# Muchas gracias!
+## Referencias y fuentes
+http://bit.ly/1nUb78b
+
+## Contacto
+Twitter: @mcuadros_
+Github: https://github.com/mcuadros
+
